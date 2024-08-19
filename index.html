@@ -20,6 +20,9 @@
     <script src="https://cdn.jsdelivr.net/npm/jointjs@3.7.7/dist/joint.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        body{
+            overflow: hidden;
+        }
         .node-editform {
             position: absolute;
             background: white;
@@ -55,7 +58,7 @@
             <textarea class="Details-input" type="text" id="Details" placeholder="Type details"></textarea>
             <br><br>
             <div class="node-editform-button">
-                <button class="savechange-button" type="button" id="saveChanges">Save Changes</button>
+                <button type="submit" class="savechange-button" type="button" id="saveChanges">Save Changes</button>
                 <button class="cancleedit-button" type="button" id="cancelEdit">Cancel</button>
             </div>
         </form>

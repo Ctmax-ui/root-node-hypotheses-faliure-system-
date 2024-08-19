@@ -5,7 +5,7 @@ const paper = new joint.dia.Paper({
     width: window.innerWidth,
     height: window.innerHeight,
     model: graph,
-    gridSize: 10,
+    gridSize: 20,
     interactive: {
         linkMove: false,
     },
@@ -38,8 +38,6 @@ paper.el.addEventListener('mousemove', function (evt) {
         const dx = evt.clientX - panStartX;
         const dy = evt.clientY - panStartY;
         paper.translate(panOffsetX + dx, panOffsetY + dy);
-        document.querySelector('.context-menu')?.remove()
-        $('#editForm').hide()
     }
 });
 
@@ -54,14 +52,13 @@ paper.el.addEventListener('mouseup', function (e) {
 // Prevent context menu from showing up during right-click drag
 paper.el.addEventListener('contextmenu', function (evt) {
     evt.preventDefault();
-    $('#editForm').hide()
 });
 
 
 
 const event = new joint.shapes.standard.Rectangle();
 event.position(700, 30);
-event.resize(250, 100);
+event.resize(270, 100);
 event.attr({
     body: {
         fill: '#E4E9F700',
@@ -84,7 +81,7 @@ graph.addCell(event);
 
 // Function to add a new Hypothesis node
 function addChild(failure) {
-    const width = 250;
+    const width = 270;
     const height = 100;
     const offset = 10; // Offset to avoid collisions
     let x = failure.position().x;
@@ -161,11 +158,11 @@ function addChild(failure) {
 // Function to add a new failure mode
 function addfailure(child) {
     if (child.attr('label/text').includes('Event')) {
-        const width = 250;
+        const width = 270;
         const height = 100;
         const offset = 10; // Offset to avoid collisions
         let x = child.position().x;
-        let y = child.position().y + 250;
+        let y = child.position().y + 270;
 
         // Function to check if position is occupied
         function isPositionOccupied(x, y) {
@@ -240,10 +237,6 @@ function addfailure(child) {
 
 // Function to delete a node and all its Hypotheses
 function deleteNode(node) {
-    // console.log(node);
-    if(node.changed.z !=1){
-        // console.log('not an main node');
-
     // Remove all links that are connected to the node
     const links = graph.getLinks();
     const linksToRemove = links.filter(link =>
@@ -263,21 +256,19 @@ function deleteNode(node) {
 
             // Remove all nodes that are below the deleted node
             if (cellPosition.y > nodePosition.y) {
-                graph?.removeCell(cell);
+                graph.removeCell(cell);
             }
         }
     });
 
     // Finally remove the node itself
-    // graph?.removeCell(node);
-}
+    graph.removeCell(node);
 }
 
 // Function to open edit form
 function openEditForm(node, x, y) {
-    console.log(node);
-    $('#failure').val(node.heading || '');
-    $('#Details').val(node.details || '');
+    $('#failure').val(node.attr('data-failure') || '');
+    $('#Details').val(node.attr('data-Details') || '');
 
     $('#editForm').css({
         display: 'block',
@@ -292,14 +283,7 @@ function openEditForm(node, x, y) {
 }
 
 // Add functionality to context menus
-
 paper.on('cell:contextmenu', (cellView, evt, x, y) => {
-    // console.log($('.context-menu'));
-    $('#editForm').hide();
-
-    $('.context-menu').each((_,e)=>{
-        e.remove()
-    })
 
     const contextNode = cellView.model;
     const contextMenu = document.createElement('div');
@@ -335,10 +319,9 @@ paper.on('cell:contextmenu', (cellView, evt, x, y) => {
     const editNodeOption = document.createElement('div');
     editNodeOption.className = 'context-menu-option';
     editNodeOption.textContent = 'Edit Node';
-    editNodeOption.onclick = (event) => {
-        openEditForm(contextNode, evt.offsetX, evt.offsetY);
+    editNodeOption.onclick = () => {
+        openEditForm(contextNode, x, y);
         document.body.removeChild(contextMenu);
-        
     };
     contextMenu.appendChild(editNodeOption);
 
@@ -357,13 +340,12 @@ paper.on('cell:contextmenu', (cellView, evt, x, y) => {
     document.addEventListener('click', () => {
         if (document.body.contains(contextMenu)) {
             document.body.removeChild(contextMenu);
-            
         }
     }, { once: true });
 });
 
 // Save edited node data
-$('.node-editform').on('submit',e=>e.preventDefault());
+$('.node-editform').on('submit',(e)=>e.preventDefault());
 $('#saveChanges').click(() => {
     const node = $('#saveChanges').data('node');
     const failure = $('#failure').val();
@@ -372,15 +354,13 @@ $('#saveChanges').click(() => {
     const originalLabel = node.attr('label/text').split('\n')[0];
 
     // Update the node label with consistent style for the entire text
-    node["heading"] = failure;
-    node["details"] = details;
 
     node.attr({
         label: {
             text: joint.util.breakText(`${originalLabel}\n\n${failure}\n\n${details}`, {
-                width: 250, 
-                height: 'auto', 
-                ellipsis: true, 
+                width: 270,
+                height: 'auto',
+                ellipsis: true,
                 backgroundColor: 'red'
             }),
             fill: '#ffff',
@@ -408,8 +388,7 @@ $('#saveChanges').click(() => {
 
         document.body.appendChild(tempElement);
         const height = tempElement.offsetHeight;
-        // console.log(tempElement.offsetHeight);
-        document.body.removeChild(tempElement);
+        // document.body.removeChild(tempElement);
 
         return height;
     }
@@ -451,18 +430,21 @@ $('#saveChanges').click(() => {
         });
     }
 
-    let count = 1
+    $('#editForm').hide();
+
     document.querySelectorAll('.v-line').forEach(e => {
-        if (e.innerHTML == failure && count != 0) {
-            count = 0
-            console.log('object', count);
+        if (e.innerHTML == failure) {
+            console.log(e); 
             e.classList.add('text-uppercase', 'text-decoration-underline')
         }
+        if (e.classList.length === 1 && e.classList.contains('v-line') && e.innerHTML == originalLabel) {
+            // This element has only the 'v-line' class and nothing more
+            e.removeAttribute('dy')
+            e.classList.add('fs-5')
+
+            console.log(e);
+        }
     });
-
-    console.log(node);
-
-    $('#editForm').hide();
 });
 
 
