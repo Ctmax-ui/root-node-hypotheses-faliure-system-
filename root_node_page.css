@@ -1,0 +1,84 @@
+.context-menu {
+  position: absolute;
+  background-color: #e4e9f7;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+  z-index: 1000;
+  border-radius: 7px;
+}
+
+.context-menu-option {
+  cursor: pointer;
+  padding: 5px;
+}
+
+#editForm {
+  position: absolute;
+  background-color: #e4e9f7;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  z-index: 1000;
+  display: none;
+  border-radius: 7px;
+}
+
+.node-editform .event-input{
+  background-color: #e4e9f7;
+  border: 1px solid #1D1B31;
+  border-radius: 5px;
+  padding-left: 10px;
+  margin-left: 5px;
+}
+
+.node-editform .failure-name{
+  background-color: #e4e9f700;
+  border: 1px solid #b9b9b9;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.node-editform .details-input{
+  background-color: #e4e9f700;
+  border: 1px solid #b9b9b9;
+  border-radius: 5px;
+}
+
+.node-editform .node-editform-button{
+  display: flex;
+  justify-content: flex-end;
+}
+
+.savechange-button {
+  min-width: 100px;
+  background-color: #334e6e00 !important;
+  border-color: #b9b9b9 !important;
+  color: #334e6e !important;
+  font-size: 16px;
+  border-radius: 6px;
+  width: 20%;
+  min-height: 36px;
+  margin-right: 10px;
+}
+
+.node-editform .savechange-button :hover{
+  min-width: 100px;
+  background-color: #334e6e !important;
+  border-color: #334e6e !important;
+  color: #ffff !important;
+}
+
+.cancleedit-button{
+  min-width: 100px;
+  background-color: #334e6e00 !important;
+  border-color: #b9b9b9 !important;
+  color: #334e6e !important;
+  font-size: 16px;
+  border-radius: 6px;
+  width: 20%;
+  min-height: 36px;
+  margin-right: 10px;
+}
+
+

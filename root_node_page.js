@@ -1,0 +1,445 @@
+const graph = new joint.dia.Graph();
+
+const paper = new joint.dia.Paper({
+    el: document.getElementById('myDiagram'),
+    width: window.innerWidth,
+    height: window.innerHeight,
+    model: graph,
+    gridSize: 20,
+    interactive: {
+        linkMove: false,
+    },
+});
+
+// Variables for panning
+let isPanning = false;
+let panStartX = 0;
+let panStartY = 0;
+let panOffsetX = 0;
+let panOffsetY = 0;
+
+// Right-click to start panning
+paper.el.addEventListener('mousedown', function (evt) {
+    if (evt.button === 2) { // Right-click
+        isPanning = true;
+        panStartX = evt.clientX;
+        panStartY = evt.clientY;
+        panOffsetX = paper.translate().tx;
+        panOffsetY = paper.translate().ty;
+    }
+    if (evt.button === 2) { // Check if the right mouse button (button === 2) is pressed
+        paper.el.style.cursor = "grab";
+    }
+});
+
+// Move the paper while panning
+paper.el.addEventListener('mousemove', function (evt) {
+    if (isPanning) {
+        const dx = evt.clientX - panStartX;
+        const dy = evt.clientY - panStartY;
+        paper.translate(panOffsetX + dx, panOffsetY + dy);
+    }
+});
+
+// Stop panning on mouse up
+paper.el.addEventListener('mouseup', function (e) {
+    isPanning = false;
+    if (e.button === 2) { // Check if the right mouse button (button === 2) is released
+        paper.el.style.cursor = "default";
+    }
+});
+
+// Prevent context menu from showing up during right-click drag
+paper.el.addEventListener('contextmenu', function (evt) {
+    evt.preventDefault();
+});
+
+
+
+const event = new joint.shapes.standard.Rectangle();
+event.position(700, 30);
+event.resize(250, 100);
+event.attr({
+    body: {
+        fill: '#E4E9F700',
+        rx: 5,
+        ry: 5,
+        strokeWidth: 4,
+        stroke: '#10439F'
+    },
+    label: {
+        text: 'Event',
+        fill: '#10439F',
+        refY: 10, // Position the label at the top
+        yAlignment: 'top',
+        fontSize: 16, // Adjust font size
+        fontWeight: 'bold' // Adjust font weight
+    },
+    cursor: 'pointer', // Allow clicking to edit
+});
+graph.addCell(event);
+
+// Function to add a new Hypothesis node
+function addChild(failure) {
+    const width = 250;
+    const height = 100;
+    const offset = 10; // Offset to avoid collisions
+    let x = failure.position().x;
+    let y = failure.position().y + 150;
+
+    // Function to check if position is occupied
+    function isPositionOccupied(x, y) {
+        const bboxToCheck = {
+            x: x,
+            y: y,
+            width: width,
+            height: height
+        };
+
+        return graph.getCells().some(cell => {
+            if (cell.isElement()) {
+                const bbox = cell.getBBox();
+                return !(bboxToCheck.x + bboxToCheck.width < bbox.x ||
+                    bboxToCheck.x > bbox.x + bbox.width ||
+                    bboxToCheck.y + bboxToCheck.height < bbox.y ||
+                    bboxToCheck.y > bbox.y + bbox.height);
+            }
+            return false;
+        });
+    }
+
+    // Find a new position if the initial position is occupied
+    let attempts = 0;
+    const maxAttempts = 100;
+    const initialX = x;
+    const paperWidth = paper.options.width;
+
+    while (isPositionOccupied(x, y) && attempts < maxAttempts) {
+        attempts++;
+        x -= width + offset;
+    }
+
+    // Create and add the new child element
+    const child = new joint.shapes.standard.Rectangle();
+    child.resize(width, height);
+    child.attr({
+        body: {
+            fill: '#E4E9F700',
+            rx: 5,
+            ry: 5,
+            strokeWidth: 4,
+            stroke: '#874CCC'
+        },
+        label: {
+            text: 'Hypothesis',
+            fill: '#874CCC',
+            refY: 10,
+            yAlignment: 'top',
+            fontSize: 16,
+            fontWeight: 'bold'
+        },
+        cursor: 'pointer',
+    });
+    child.position(x, y);
+    graph.addCell(child);
+
+    // Create and add the link between the failure and the new child
+    const link = new joint.shapes.standard.Link({
+        source: { id: failure.id, port: 'out' },
+        target: { id: child.id, port: 'in' },
+        attrs: { '.connection': { stroke: '#334e6e', 'stroke-width': 2 } },
+        connector: { name: 'smooth' }, // Use smooth Bezier curves
+    });
+
+    graph.addCell(link);
+}
+
+
+// Function to add a new failure mode
+function addfailure(child) {
+    if (child.attr('label/text').includes('Event')) {
+        const width = 250;
+        const height = 100;
+        const offset = 10; // Offset to avoid collisions
+        let x = child.position().x;
+        let y = child.position().y + 250;
+
+        // Function to check if position is occupied
+        function isPositionOccupied(x, y) {
+            const bboxToCheck = {
+                x: x,
+                y: y,
+                width: width,
+                height: height
+            };
+
+            return graph.getCells().some(cell => {
+                if (cell.isElement()) {
+                    const bbox = cell.getBBox();
+                    return !(bboxToCheck.x + bboxToCheck.width < bbox.x ||
+                        bboxToCheck.x > bbox.x + bbox.width ||
+                        bboxToCheck.y + bboxToCheck.height < bbox.y ||
+                        bboxToCheck.y > bbox.y + bbox.height);
+                }
+                return false;
+            });
+        }
+
+        // Find a new position if the initial position is occupied
+        let attempts = 0;
+        const maxAttempts = 100;
+        const initialX = x;
+        const paperWidth = paper.options.width;
+
+
+        while (isPositionOccupied(x, y) && attempts < maxAttempts) {
+            attempts++;
+
+            x -= width + offset;
+        }
+
+        // Create and add the new failure mode element
+        const failure = new joint.shapes.standard.Rectangle();
+        failure.resize(width, height);
+        failure.attr({
+            body: {
+                fill: '#E4E9F700',
+                rx: 5,
+                ry: 5,
+                strokeWidth: 4,
+                stroke: '#C65BCF'
+            },
+            label: {
+                text: 'failure mode',
+                fill: '#C65BCF',
+                refY: 10,
+                yAlignment: 'top',
+                fontSize: 16,
+                fontWeight: 'bold'
+            },
+            cursor: 'pointer',
+        });
+        failure.position(x, y);
+        graph.addCell(failure);
+
+        // Create and add the link between the child and the new failure mode
+        const link = new joint.shapes.standard.Link({
+            source: { id: child.id, port: 'out' },
+            target: { id: failure.id, port: 'in' },
+            attrs: { '.connection': { stroke: '#334e6e', 'stroke-width': 2 } },
+            connector: { name: 'smooth' },
+        });
+
+        graph.addCell(link);
+    }
+}
+
+
+// Function to delete a node and all its Hypotheses
+function deleteNode(node) {
+    // Remove all links that are connected to the node
+    const links = graph.getLinks();
+    const linksToRemove = links.filter(link =>
+        link.get('source').id === node.id || link.get('target').id === node.id
+    );
+    graph.removeCells(linksToRemove);
+
+    // Remove the node itself
+    graph.removeCells([node]);
+
+    // Get all nodes
+    const cells = graph.getCells();
+    cells.forEach(cell => {
+        if (cell.isElement() && cell.get('attrs/label/text')?.startsWith('Hypotheses-2')) {
+            const nodePosition = node.position();
+            const cellPosition = cell.position();
+
+            // Remove all nodes that are below the deleted node
+            if (cellPosition.y > nodePosition.y) {
+                graph.removeCell(cell);
+            }
+        }
+    });
+
+    // Finally remove the node itself
+    graph.removeCell(node);
+}
+
+// Function to open edit form
+function openEditForm(node, x, y) {
+    $('#failure').val(node.attr('data-failure') || '');
+    $('#Details').val(node.attr('data-Details') || '');
+
+    $('#editForm').css({
+        display: 'block',
+        top: y + 'px',
+        left: x + 'px'
+    });
+
+    // Store the node being edited and the position for context menu
+    $('#saveChanges').data('node', node);
+    $('#saveChanges').data('x', x);
+    $('#saveChanges').data('y', y);
+}
+
+// Add functionality to context menus
+paper.on('cell:contextmenu', (cellView, evt, x, y) => {
+
+    const contextNode = cellView.model;
+    const contextMenu = document.createElement('div');
+    contextMenu.className = 'context-menu';
+    contextMenu.style.left = evt.offsetX + 'px';
+    contextMenu.style.top = evt.offsetY + 'px';
+
+    document.body.appendChild(contextMenu);
+
+
+    if (contextNode.attr('label/text').includes('Event')) {
+        const addfailureOption = document.createElement('div');
+        addfailureOption.className = 'context-menu-option';
+        addfailureOption.textContent = 'Add failure';
+        addfailureOption.onclick = () => {
+            addfailure(contextNode);
+            document.body.removeChild(contextMenu);
+        };
+        contextMenu.appendChild(addfailureOption);
+    }
+
+    if (contextNode.attr('label/text').includes('failure mode') || contextNode.attr('label/text').includes('Hypothesis')) {
+        const addHypothesisOption = document.createElement('div');
+        addHypothesisOption.className = 'context-menu-option';
+        addHypothesisOption.textContent = 'Add Hypothesis';
+        addHypothesisOption.onclick = () => {
+            addChild(contextNode);
+            document.body.removeChild(contextMenu);
+        };
+        contextMenu.appendChild(addHypothesisOption);
+    }
+
+    const editNodeOption = document.createElement('div');
+    editNodeOption.className = 'context-menu-option';
+    editNodeOption.textContent = 'Edit Node';
+    editNodeOption.onclick = () => {
+        openEditForm(contextNode, x, y);
+        document.body.removeChild(contextMenu);
+    };
+    contextMenu.appendChild(editNodeOption);
+
+    const deleteOption = document.createElement('div');
+    deleteOption.className = 'context-menu-option';
+    deleteOption.textContent = 'Delete Node';
+    deleteOption.onclick = () => {
+        deleteNode(contextNode);
+        document.body.removeChild(contextMenu);
+    };
+    contextMenu.appendChild(deleteOption);
+
+
+
+    // Remove the context menu when clicking anywhere else
+    document.addEventListener('click', () => {
+        if (document.body.contains(contextMenu)) {
+            document.body.removeChild(contextMenu);
+        }
+    }, { once: true });
+});
+
+// Save edited node data
+$('#saveChanges').click(() => {
+    const node = $('#saveChanges').data('node');
+    const failure = $('#failure').val();
+    const details = $('#Details').val();
+
+    const originalLabel = node.attr('label/text').split('\n')[0];
+
+    // Update the node label with consistent style for the entire text
+    
+    node.attr({
+        label: {
+            text: joint.util.breakText(`${originalLabel}\n\n${failure}\n\n${details}`, {
+                width: 250, 
+                height: 'auto', 
+                ellipsis: true, 
+                backgroundColor: 'red'
+            }),
+            fill: '#ffff',
+            // refY: 10,
+            yAlignment: 'top',
+            fontSize: 16,  // Set a font size for the entire label
+            fontWeight: '600', // Set a font weight for the entire label
+            fontFamily: 'sans-serif'
+        }
+    });
+
+
+    // Function to calculate the required height for the text
+    function getTextHeight(text, width, fontSize) {
+        const tempElement = document.createElement('div');
+        tempElement.style.position = 'absolute';
+        tempElement.style.top = 0;
+        tempElement.style.visibility = 'hidden';
+        tempElement.style.backgroundColor = 'grey';
+        tempElement.style.padding = '20px';
+        tempElement.style.width = `${width}px`;
+        tempElement.style.fontSize = `${fontSize}px`;
+        tempElement.style.whiteSpace = 'no-wrap'; // Ensure the text wraps
+        tempElement.innerHTML = text.replace(/\n/g, '<br>');
+
+        document.body.appendChild(tempElement);
+        const height = tempElement.offsetHeight;
+        console.log(tempElement.offsetHeight);
+        // document.body.removeChild(tempElement);
+
+        return height;
+    }
+
+    const text = `${originalLabel}\n${failure}\n${details}`;
+    const width = 270; // Fixed width
+    const fontSize = 12; // Font size
+
+    // Calculate the required height for the text
+    const requiredHeight = getTextHeight(text, width, fontSize);
+
+    // Update the node size with the fixed width and new height
+    node.resize(width, requiredHeight + 40);
+
+    // Apply different styles based on node type
+    if (originalLabel === 'Event') {
+        node.attr({
+            body: {
+                fill: '#10439F',
+                stroke: '#10439F',
+                strokeWidth: 2,
+            }
+        });
+    } else if (originalLabel === 'failure mode') {
+        node.attr({
+            body: {
+                fill: '#C65BCF',
+                stroke: '#C65BCF',
+                strokeWidth: 2,
+            }
+        });
+    } else if (originalLabel === 'Hypothesis') {
+        node.attr({
+            body: {
+                fill: '#874CCC',
+                stroke: '#874CCC',
+                strokeWidth: 2,
+            }
+        });
+    }
+
+    $('#editForm').hide();
+});
+
+
+// Cancel editing
+$('#cancelEdit').click(() => {
+    $('#editForm').hide();
+});
+
+// Hide context menu when clicking anywhere else
+$(document).on('click', () => {
+    $('.context-menu').remove();
+});
