@@ -275,7 +275,7 @@ function deleteNode(node) {
 
 // Function to open edit form
 function openEditForm(node, x, y) {
-    console.log(node);
+    // console.log(node);
     $('#failure').val(node.heading || '');
     $('#Details').val(node.details || '');
 
@@ -455,12 +455,12 @@ $('#saveChanges').click(() => {
     document.querySelectorAll('.v-line').forEach(e => {
         if (e.innerHTML == failure && count != 0) {
             count = 0
-            console.log('object', count);
+            // console.log('object', count);
             e.classList.add('text-uppercase', 'text-decoration-underline')
         }
     });
 
-    console.log(node);
+    // console.log(node);
 
     $('#editForm').hide();
 });
