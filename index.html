@@ -47,22 +47,50 @@
     </style>
 </head>
 <body oncontextmenu="return false">
-    <div id="myDiagram" style="width: 1800px; height: 700px;"></div>
+    <div id="myDiagram" style="width: 1800px; height: 700px; "></div>
 
-    <div id="editForm" style="display: none;">
-        <form class="node-editform">
-            <h3 style="display: flex;justify-content: center;">Update details</h3>
-            <label class="failure" for="failure">failure</label>
-            <input class="failure-name" type="text" id="failure" placeholder="Failure Name"><br><br>
+    <div id="editForm" class="border-0 shadow-none bg-transparent" style="display: none;">
+        <form class="node-editform form">
+            <div id="editFormMover" class="position-absolute top-0 end-0 bg-secondary text-white "><i class="bi bi-arrows-move px-4"></i></div>
+            <h3 class="text-nowrap mb-3">Update details</h3>
+            <label class="failure" for="failure">Heading</label>
+            <input class="failure-name px-2 py-1 mb-2" type="text" id="failure" placeholder="Heading Name">
             <label class="Details" for="Details">Details</label>
-            <textarea class="Details-input" type="text" id="Details" placeholder="Type details"></textarea>
-            <br><br>
-            <div class="node-editform-button">
-                <button type="submit" class="savechange-button" type="button" id="saveChanges">Save Changes</button>
-                <button class="cancleedit-button" type="button" id="cancelEdit">Cancel</button>
+            <textarea class="Details-input w-100 px-2 py-1 mb-2 rounded-1" type="text" id="Details" placeholder="Type details"></textarea>
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-outline-secondary" type="button" id="saveChanges">Save</button>
+                <button class="btn btn-outline-secondary" type="button" id="cancelEdit">Cancel</button>
             </div>
         </form>
     </div>
     <script src="./root_node_page.js"></script>
+    <script>
+        const editForm = document.getElementById("editForm");
+        const editFormMover = editForm.querySelector("#editFormMover");
+    
+        let isDragging = false;
+        let offsetX, offsetY;
+    
+        editFormMover.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            offsetX = e.clientX - editForm.offsetLeft;
+            offsetY = e.clientY - editForm.offsetTop;
+            document.addEventListener("mousemove", onMouseMove);
+            document.addEventListener("mouseup", onMouseUp);
+        });
+    
+        function onMouseMove(e) {
+            if (isDragging) {
+                editForm.style.left = `${e.clientX - offsetX}px`;
+                editForm.style.top = `${e.clientY - offsetY}px`;
+            }
+        }
+    
+        function onMouseUp() {
+            isDragging = false;
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+        }
+    </script>
 </body>
 </html>

@@ -31,6 +31,11 @@
   padding-left: 10px;
   margin-left: 5px;
 }
+#editFormMover{
+  :hover{
+    cursor: move;
+  }
+}
 
 .node-editform .failure-name{
   background-color: #e4e9f700;
@@ -45,10 +50,6 @@
   border-radius: 5px;
 }
 
-.node-editform .node-editform-button{
-  display: flex;
-  justify-content: flex-end;
-}
 
 .savechange-button {
   min-width: 100px;
