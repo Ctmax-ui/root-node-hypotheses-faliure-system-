@@ -240,8 +240,8 @@ function addfailure(child) {
 
 // Function to delete a node and all its Hypotheses
 function deleteNode(node) {
-    // console.log(node);
-    if(node.changed.z !=1){
+    console.log(node.attributes.z);
+    if(node.attributes.z !=1){
         // console.log('not an main node');
 
     // Remove all links that are connected to the node
