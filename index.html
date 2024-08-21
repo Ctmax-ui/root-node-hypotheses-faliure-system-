@@ -64,33 +64,5 @@
         </form>
     </div>
     <script src="./root_node_page.js"></script>
-    <script>
-        const editForm = document.getElementById("editForm");
-        const editFormMover = editForm.querySelector("#editFormMover");
-    
-        let isDragging = false;
-        let offsetX, offsetY;
-    
-        editFormMover.addEventListener("mousedown", (e) => {
-            isDragging = true;
-            offsetX = e.clientX - editForm.offsetLeft;
-            offsetY = e.clientY - editForm.offsetTop;
-            document.addEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseup", onMouseUp);
-        });
-    
-        function onMouseMove(e) {
-            if (isDragging) {
-                editForm.style.left = `${e.clientX - offsetX}px`;
-                editForm.style.top = `${e.clientY - offsetY}px`;
-            }
-        }
-    
-        function onMouseUp() {
-            isDragging = false;
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseup", onMouseUp);
-        }
-    </script>
 </body>
 </html>

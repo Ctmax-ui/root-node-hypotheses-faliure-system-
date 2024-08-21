@@ -241,36 +241,36 @@ function addfailure(child) {
 // Function to delete a node and all its Hypotheses
 function deleteNode(node) {
     // console.log(node.attributes.z);
-    if(node.attributes.z !=1){
+    if (node.attributes.z != 1) {
         // console.log('not an main node');
 
-    // Remove all links that are connected to the node
-    const links = graph.getLinks();
-    const linksToRemove = links.filter(link =>
-        link.get('source').id === node.id || link.get('target').id === node.id
-    );
-    graph.removeCells(linksToRemove);
+        // Remove all links that are connected to the node
+        const links = graph.getLinks();
+        const linksToRemove = links.filter(link =>
+            link.get('source').id === node.id || link.get('target').id === node.id
+        );
+        graph.removeCells(linksToRemove);
 
-    // Remove the node itself
-    graph.removeCells([node]);
+        // Remove the node itself
+        graph.removeCells([node]);
 
-    // Get all nodes
-    const cells = graph.getCells();
-    cells.forEach(cell => {
-        if (cell.isElement() && cell.get('attrs/label/text')?.startsWith('Hypotheses-2')) {
-            const nodePosition = node.position();
-            const cellPosition = cell.position();
+        // Get all nodes
+        const cells = graph.getCells();
+        cells.forEach(cell => {
+            if (cell.isElement() && cell.get('attrs/label/text')?.startsWith('Hypotheses-2')) {
+                const nodePosition = node.position();
+                const cellPosition = cell.position();
 
-            // Remove all nodes that are below the deleted node
-            if (cellPosition.y > nodePosition.y) {
-                graph?.removeCell(cell);
+                // Remove all nodes that are below the deleted node
+                if (cellPosition.y > nodePosition.y) {
+                    graph?.removeCell(cell);
+                }
             }
-        }
-    });
+        });
 
-    // Finally remove the node itself
-    // graph?.removeCell(node);
-}
+        // Finally remove the node itself
+        // graph?.removeCell(node);
+    }
 }
 
 // Function to open edit form
@@ -297,7 +297,7 @@ paper.on('cell:contextmenu', (cellView, evt, x, y) => {
     // console.log($('.context-menu'));
     $('#editForm').hide();
 
-    $('.context-menu').each((_,e)=>{
+    $('.context-menu').each((_, e) => {
         e.remove()
     })
 
@@ -338,7 +338,7 @@ paper.on('cell:contextmenu', (cellView, evt, x, y) => {
     editNodeOption.onclick = (event) => {
         openEditForm(contextNode, evt.offsetX, evt.offsetY);
         document.body.removeChild(contextMenu);
-        
+
     };
     contextMenu.appendChild(editNodeOption);
 
@@ -357,13 +357,13 @@ paper.on('cell:contextmenu', (cellView, evt, x, y) => {
     document.addEventListener('click', () => {
         if (document.body.contains(contextMenu)) {
             document.body.removeChild(contextMenu);
-            
+
         }
     }, { once: true });
 });
 
 // Save edited node data
-$('.node-editform').on('submit',e=>e.preventDefault());
+$('.node-editform').on('submit', e => e.preventDefault());
 $('#saveChanges').click(() => {
     const node = $('#saveChanges').data('node');
     const failure = $('#failure').val();
@@ -378,9 +378,9 @@ $('#saveChanges').click(() => {
     node.attr({
         label: {
             text: joint.util.breakText(`${originalLabel}\n\n${failure}\n\n${details}`, {
-                width: 250, 
-                height: 'auto', 
-                ellipsis: true, 
+                width: 250,
+                height: 'auto',
+                ellipsis: true,
                 backgroundColor: 'red'
             }),
             fill: '#ffff',
@@ -475,3 +475,32 @@ $('#cancelEdit').click(() => {
 $(document).on('click', () => {
     $('.context-menu').remove();
 });
+
+
+// for the edit modal moving function
+const editForm = document.getElementById("editForm");
+const editFormMover = editForm.querySelector("#editFormMover");
+
+let isDragging = false;
+let offsetX, offsetY;
+
+editFormMover.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    offsetX = e.clientX - editForm.offsetLeft;
+    offsetY = e.clientY - editForm.offsetTop;
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+});
+
+function onMouseMove(e) {
+    if (isDragging) {
+        editForm.style.left = `${e.clientX - offsetX}px`;
+        editForm.style.top = `${e.clientY - offsetY}px`;
+    }
+}
+
+function onMouseUp() {
+    isDragging = false;
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+}
